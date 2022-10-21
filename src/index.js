@@ -1,8 +1,8 @@
-import path from 'path';
-import postcss from 'postcss';
-import cosmiconfig from 'cosmiconfig';
-import isResolvable from 'is-resolvable';
-import defaultPreset from 'lerna:@applaud/cssnano-preset-default';
+const path = require('path');
+const postcss = require('postcss');
+const cosmiconfig = require('cosmiconfig');
+const isResolvable = require('isResolvable');
+const defaultPreset = require('lerna:@applaud/cssnano-preset-default');
 
 const cssnano = 'cssnano';
 
