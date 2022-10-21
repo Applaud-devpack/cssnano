@@ -1,7 +1,7 @@
 # @applaud/cssnano
 
 
-##Install
+## Install
 
 ```bash
 npm install @applaud/cssnano
