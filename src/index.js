@@ -1,26 +1,37 @@
-const path = require('path');
-const postcss = require('postcss');
-const cosmiconfig = require('cosmiconfig');
-const isResolvable = require('isResolvable');
-const defaultPreset = require('lerna:@applaud/cssnano-preset-default');
+'use strict';
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+
+var _path = require('path');
+
+var _path2 = _interopRequireDefault(_path);
+
+var _postcss = require('postcss');
+
+var _postcss2 = _interopRequireDefault(_postcss);
+
+var _cosmiconfig = require('cosmiconfig');
+
+var _cosmiconfig2 = _interopRequireDefault(_cosmiconfig);
+
+var _isResolvable = require('is-resolvable');
+
+var _isResolvable2 = _interopRequireDefault(_isResolvable);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
 const cssnano = 'cssnano';
 
-function initializePlugin (plugin, css, result) {
+function initializePlugin(plugin, css, result) {
     if (Array.isArray(plugin)) {
         const [processor, opts] = plugin;
-        if (
-            typeof opts === 'undefined' ||
-            (typeof opts === 'object' && !opts.exclude)
-        ) {
-            return Promise.resolve(
-                processor(opts)(css, result)
-            );
+        if (typeof opts === 'undefined' || typeof opts === 'object' && !opts.exclude || typeof opts === 'boolean' && opts === true) {
+            return Promise.resolve(processor(opts)(css, result));
         }
     } else {
-        return Promise.resolve(
-            plugin()(css, result)
-        );
+        return Promise.resolve(plugin()(css, result));
     }
     // Handle excluded plugins
     return Promise.resolve();
@@ -34,7 +45,7 @@ function initializePlugin (plugin, css, result) {
  * preset = {plugins: []} <- already invoked function
  */
 
-function resolvePreset (preset) {
+function resolvePreset(preset) {
     let fn, options;
     if (Array.isArray(preset)) {
         fn = preset[0];
@@ -49,19 +60,19 @@ function resolvePreset (preset) {
     }
     // Provide an alias for the default preset, as it is built-in.
     if (fn === 'default') {
-        return Promise.resolve(defaultPreset(options).plugins);
+        return Promise.resolve(require('@applaud/cssnano-preset-default')(options).plugins);
     }
     // For non-JS setups; we'll need to invoke the preset ourselves.
     if (typeof fn === 'function') {
         return Promise.resolve(fn(options).plugins);
     }
     // Try loading a preset from node_modules
-    if (isResolvable(fn)) {
+    if ((0, _isResolvable2.default)(fn)) {
         return Promise.resolve(require(fn)(options).plugins);
     }
     const sugar = `cssnano-preset-${fn}`;
     // Try loading a preset from node_modules (sugar)
-    if (isResolvable(sugar)) {
+    if ((0, _isResolvable2.default)(sugar)) {
         return Promise.resolve(require(sugar)(options).plugins);
     }
     // If all else fails, we probably have a typo in the config somewhere
@@ -74,24 +85,22 @@ function resolvePreset (preset) {
  * load an external file.
  */
 
-function resolveConfig (css, result, options) {
+function resolveConfig(css, result, options) {
     if (options.preset) {
         return resolvePreset(options.preset);
     }
 
     const inputFile = css.source && css.source.input && css.source.input.file;
-    let searchPath = inputFile ? path.dirname(inputFile) : process.cwd();
+    let searchPath = inputFile ? _path2.default.dirname(inputFile) : process.cwd();
     let configPath = null;
 
     if (options.configFile) {
         searchPath = null;
-        configPath = path.resolve(process.cwd(), options.configFile);
+        configPath = _path2.default.resolve(process.cwd(), options.configFile);
     }
 
-    const configExplorer = cosmiconfig(cssnano);
-    const searchForConfig = configPath
-        ? configExplorer.load(configPath)
-        : configExplorer.search(searchPath);
+    const configExplorer = (0, _cosmiconfig2.default)(cssnano);
+    const searchForConfig = configPath ? configExplorer.load(configPath) : configExplorer.search(searchPath);
 
     return searchForConfig.then(config => {
         if (config === null) {
@@ -101,12 +110,13 @@ function resolveConfig (css, result, options) {
     });
 }
 
-export default postcss.plugin(cssnano, (options = {}) => {
+exports.default = _postcss2.default.plugin(cssnano, (options = {}) => {
     return (css, result) => {
-        return resolveConfig(css, result, options).then((plugins) => {
+        return resolveConfig(css, result, options).then(plugins => {
             return plugins.reduce((promise, plugin) => {
                 return promise.then(initializePlugin.bind(null, plugin, css, result));
             }, Promise.resolve());
         });
     };
 });
+module.exports = exports['default'];
