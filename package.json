@@ -1,6 +1,6 @@
 {
   "name": "@applaud/cssnano",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A modular minifier, built on top of the PostCSS ecosystem.",
   "main": "dist/index.js",
   "scripts": {
@@ -20,7 +20,7 @@
   ],
   "license": "MIT",
   "dependencies": {
-    "@applaud/cssnano-preset-default": "^1.0.0",
+    "@applaud/cssnano-preset-default": "^1.0.1",
     "cosmiconfig": "^5.0.0",
     "is-resolvable": "^1.0.0",
     "postcss": "^7.0.0"
